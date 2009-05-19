@@ -14,6 +14,8 @@
 #  "Share and enjoy"...... ;)  
 
 
+import hashlib, os 
+
 #  A class to create the repo-thingy (as the Captain would say...)   
 class repo():
    # Name of the "repo"   	
@@ -21,42 +23,57 @@ class repo():
       self.name = name 
 	  
    # Initialise the "repo" 	  
-   def init():
-      data = {} 	  
+   def init(self):
+	  self.data = {} 
+	  print "Repo is initialised" 	  
 	  
    # Get the SHA1 hash of the data. Pth is the path 
-   # to the data.  	  
-   def sha1hash(pth): 
+   # to the data. 
+   # Suppress the call to "self".  
+   # @staticmethod   	  
+   def sha1hash(self, pth): 
 	  f=open(pth,'rb').read()
-	  sh=hashlib.sha1(f).hexdigest()
-	  print sh 
-	  return sh 	  
+	  self.sh=hashlib.sha1(f).hexdigest() 	  
+	  self.dirname = self.sh[0:2]  
+	  print "dirname is " + self.dirname 
+	  print "sha1hash is " + self.sh  
+	  return self.sh, self.dirname  	  
 	  
-   # Create the "dirname" from the first two characters of the 
-   # hash hexdigest.  
-   def dirname(sh): 	  
-	  dirname = sh[0:2] 
-	  print "dirname is " + dirname 
-	  return dirname 
 		  
    # Add data to the repo. Give a label to the "commit". 		  
    # Note - For now, this does not actually store any data - only 
    # the hexdigest string.  
-   def commit(pth, label):	
-      data[dirname] = sh  
+
+   def commit(self, mylabel):	
+	   self.data[self.dirname] = self.sh  
+	   self.label = mylabel 
 	  
    #  Print the contents of the "repo"  
    def display(self):
-	   for k,v in data:
+	   for k,v in self.data:
 		   print k, v
 		   
 		   	 	  
 #  Test this cr^H^H code.... ;)  
 myclass = repo() 
 
+myclass.init() 
+
 myclass.setname('test repo') 
 
-myclass.sha1hash('README') 
+myclass.sha1hash('README')
+
+print myclass.name 
+
+myclass.commit("First commit") 
+
+myclass.display() 
+
+
+
+   
+
+  
 
 
 
