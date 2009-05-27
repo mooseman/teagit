@@ -67,17 +67,6 @@ myclass.add('README')
 
 myclass.commit("First commit") 
 
-
-
 myclass.display() 
 
 
-
-   
-
-  
-
-
-
-
-  	  
