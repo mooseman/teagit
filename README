@@ -6,20 +6,19 @@
 Teagit - the answer to the ultimate question of Life, the Universe and a 
 bored aspie coder with some time on his hands....
 
-The toy pseudo-quasi-repo-version-tracking thingy that is 
+The toy pseudo-quasi-version-tracking-like app that is 
 almost (but not quite) entirely unlike Git....  
 
 If Git were a drink, and a Nutri-Matic Drink Synthesizer attempted 
 to make it, it would probably create something like this....   
 
+No simulated version-tracking is present in either the Python or 
+the C++ versions yet, but it is planned to be added.  
+
 This is meant as a toy and nothing else, but feel free to 
 weld aircraft wings, warp drives or anything else onto it.  
 
 Teagit is released to the public domain.  
-
-If anyone thinks that the Python version of this does not supply enough torment, 
-then fear not - a Ruby version is also being planned^H^H^H^H^H^H^H
-procrastinated about.  As for Haskell, well ... "a man can dream, can't he?"  
 
 Brought to you by the number 42.  
 
