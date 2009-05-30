@@ -1,7 +1,7 @@
 
 //
-//  A very simple parser that is almost (but not entirely) 
-//  unlike Git..... :)  
+//  A very simple parser that is almost (but not quite) 
+//  entirely unlike Git..... :)  
 //  Yep, this is Teagit in C++.  
 //  
 //  NOTE - as of now (30th May 2009) this parser requires 

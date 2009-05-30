@@ -23,6 +23,7 @@ class repo():
    # The list stores the data after the add.  	  
    # The dict stores the data when a commit is done. 
    def init(self, name):  
+     self.dirnamelist = []    
      self.tempdata = []       
      self.data = {} 
      self.name = name 
@@ -37,33 +38,30 @@ class repo():
      f=open(pth,'rb').read()
      self.sh=hashlib.sha1(f).hexdigest() 	  
      self.dirname = self.sh[0:2]  
+     self.dirnamelist.append(self.dirname)   	 
      self.tempdata.append(self.sh) 
-     print "dirname is " + self.dirname 
-     print "sha1hash is " + self.sh  
-     print "Data added is " + str(self.tempdata) 
-     return self.sh, self.dirname 
-   
-	   	  		 	  
+        	   	  		 	 
    # Commit the data that has been added. 
    # Give a label to the "commit". 		  
    def commit(self, mylabel):	
-      self.label = mylabel 
-      for elem in self.tempdata: 
-	     self.data[self.dirname] = elem   
-   
-	  
+      self.label = mylabel 	  
+      self.data.update(zip(self.dirnamelist, self.tempdata) )   
+      	  
    #  Print the contents of the "repo"  
    def display(self):
-	   for k,v in self.data:
-		   print k, v
-		   
-		   	 	  
+	   print self.data 
+	   
+		   		   	 	  
 #  Test this cr^H^H code.... ;)  
 myclass = repo() 
 
 myclass.init('my repo') 
 
-myclass.add('README')
+myclass.add('README') 
+
+myclass.add('Vitai-Lampada.txt') 
+
+myclass.add('Mary-had-a-great-big-moose.txt') 
 
 myclass.commit("First commit") 
 

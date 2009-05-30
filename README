@@ -15,6 +15,11 @@ to make it, it would probably create something like this....
 No simulated version-tracking is present in either the Python or 
 the C++ versions yet, but it is planned to be added.  
 
+NOTE - this README and the two text files in this repo are used 
+as the data to be "committed" in the "repository".  
+
+  ******************************************************* 
+
 This is meant as a toy and nothing else, but feel free to 
 weld aircraft wings, warp drives or anything else onto it.  
 
