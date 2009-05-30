@@ -38,8 +38,9 @@ class repo():
      f=open(pth,'rb').read()
      self.sh=hashlib.sha1(f).hexdigest() 	  
      self.dirname = self.sh[0:2]  
+     self.gitfilename = self.sh[3:41] 
      self.dirnamelist.append(self.dirname)   	 
-     self.tempdata.append(self.sh) 
+     self.tempdata.append(self.gitfilename) 
         	   	  		 	 
    # Commit the data that has been added. 
    # Give a label to the "commit". 		  
