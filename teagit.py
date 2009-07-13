@@ -1,71 +1,174 @@
 
 
-#  A simple program to create a thing that 
-#  is almost (but not quite) entirely unlike a Git repo. 
+#  new_teagit.py 
 
-#  If Git were a drink, and a Nutri-Matic Drink 
-#  Synthesizer attempted to make it, it would probably 
-#  create something like this....   
+#  A new version of teagit which tries to make more use 
+#  of classes. This is aimed at coming a bit closer to 
+#  the way that Git fits together. 
+ 
+#  TO DO - 
+#  1 - Get the most basic functionality working. 
+#  That is - get a file's name, mode (permissions) and 
+#  its SHA1 hash.  Save these to disk (probably using pickle). 
 
-#  Teagit - "Almost (but not quite) entirely unlike Git". 
+#  2 - Start on computing diffs on files. Find out exactly 
+#  what changes in a file from revision to revision. 
 
-#  Author:  mooseman 
-#  This code is released to the public domain. 
-#  "Share and enjoy"...... ;)  
+#  3 - Look at implementing the Git index. It is the contents 
+#  of this (not the working directory) that are added in a commit. 
 
 
-import hashlib, os 
+import hashlib 
 
-#  A class to create the repo-thingy (as the Captain would say...)   
-class repo():
-   	  
-   # Initialise the "repo"
-   # The list stores the data after the add.  	  
-   # The dict stores the data when a commit is done. 
-   def init(self, name):  
-     self.dirnamelist = []    
-     self.tempdata = []       
-     self.data = {} 
-     self.name = name 
-     print "Repo " + '"' + self.name + '"' + " is initialised" 	  
-	  
-   
-   # Add data to the repo. 
-   # Note - For now, this does not actually store any data - only 
-   # the hexdigest string.  
-   #  Add some data.   
-   def add(self, pth):  
-     f=open(pth,'rb').read()
-     self.sh=hashlib.sha1(f).hexdigest() 	  
-     self.dirname = self.sh[0:2]  
-     self.gitfilename = self.sh[3:41] 
-     self.dirnamelist.append(self.dirname)   	 
-     self.tempdata.append(self.gitfilename) 
-        	   	  		 	 
-   # Commit the data that has been added. 
-   # Give a label to the "commit". 		  
-   def commit(self, mylabel):	
-      self.label = mylabel 	  
-      self.data.update(zip(self.dirnamelist, self.tempdata) )   
-      	  
-   #  Print the contents of the "repo"  
+#  A file class 
+class file(object): 
+   def __init__(self):  
+      self.data = {}  
+      
+   def add(self, fname): 
+      self.file = open(fname,'rb').read() 
+      self.sh=hashlib.sha1(file).hexdigest() 	  
+      self.dirname = self.sh[0:2]  
+      self.gitfilename = self.sh[3:41] 
+      self.data.update({ self.sh:  [self.file, self.dirname, self.gitfilename] })   
+            
    def display(self):
-	   print self.data 
-	   
-		   		   	 	  
-#  Test this cr^H^H code.... ;)  
-myclass = repo() 
+      print self.data   
+      
+      
+#  Create a file or two 
+a = file()
+b = file() 
+       
+      
+            
+#  A blob class. A blob contains the contents 
+#  of a file - it is a binary "blob" of data. 
+class blob(object):  
+   def init(self): 
+      self.data = {} 
+      
+   def add(self, file): 
+      self.fname = file.fname 
+      self.objectid = file.objectid  
+      self.type = "blob" 
+             
+      
+        
+#  A tree class. This has the following attributes - 
+#  mode, object-type (file or tree), file (or tree) name, 
+#  objectID (which is the SHA1 hash of the object).  
+class tree(object): 
+   def init(self): 
+      self.prev = self.address = self.next = 0
+      self.branch = "Main" 
+      self.nodedict = {} 
 
-myclass.init('my repo') 
+   def add(self, branch, data): 
+      self.branch = branch 
+      self.data = data        
+      self.address = self.next 
+      self.next += 1 
+      self.nodedict.update( {self.address: (self.branch, self.prev , self.next, self.data ) }) 
+      self.prev = self.address  
+            
+   def display(self): 
+      print self.nodedict 
+      
+#  Run the code 
+a = tree() 
 
-myclass.add('README') 
+a.init() 
 
-myclass.add('Vitai-Lampada.txt') 
+a.add("Main", "foo bar baz") 
 
-myclass.add('Mary-had-a-great-big-moose.txt') 
-
-myclass.commit("First commit") 
-
-myclass.display() 
+a.add("Main", (12, 43, 54, 68) ) 
 
 
+
+class tree2(object): 
+   def init(self): 
+      self.data = {}   
+
+   def add(self, mode, name, objectid): 
+      self.mode = mode 
+      self.name = name 
+      self.object_type = name.object_type       
+      self.objectid = objectid      
+   
+   def display(self): 
+      print self.mode, self.object_type, self.name, self.objectid 
+   
+   
+#  Create a few trees 
+c = tree() 
+d = tree() 
+e = tree() 
+   
+      
+   
+#  A commit object. This object is made up of trees - it shows 
+#  the state of a tree as at a given point in time. 
+#  The key is the objectid.  
+class commit(object): 
+   def __init__(self): 
+      self.data = {} 
+      self.prev = self.curr = self.next = None 
+      self.object_type = "commit" 
+      
+   def add(self,tree): 
+      self.data.update({ tree.objectid:  tree.name} ) 
+      #  Update the prev, curr and next variables. 
+            
+     
+#  A Git tag class.  
+class tag(object): 
+   def init(self): 
+      self.data = {} 
+      
+   def add(self, commit, desc): 
+      self.tagID = commit.objectid 
+      self.desc = desc 
+      self.type = "tag" 
+            
+           
+   
+#  A Git object class. A git object can be one of the following  
+#  types - blob, tree, commit, tag. 
+class gitobject(object):
+   def init(self): 
+      self.data = {} 
+      
+   def add(self, obj): 
+      self.object_id = obj.object_id 
+      self.name = obj.name 
+      self.obj_type = obj.type 
+      self.data.update({ self.objectid: [self.name, self.obj_type] } ) 
+      
+                  
+   
+   
+#  A repository object. This is a container for everything 
+#  above. 
+class repo(object): 
+   def init(self): 
+      self.data = {} 
+
+   def add(self, path, repo, objects, refs, heads, HEAD): 
+      self.path = path 
+      self.repo = self.path + repo 
+      self.objects = objects 
+      self.refs = refs 
+      self.heads = heads 
+      self.HEAD = HEAD 
+
+   # A method to display the contents of a given commit 
+   def show_commit(self, commitID): 
+      print self.data[commitID]   
+                  
+   def display(self): 
+      print self.repo, self.objects, self.heads 
+      
+      
+      
+            
