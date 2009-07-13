@@ -1,0 +1,40 @@
+
+>>> d = {0: "foo", 1: "bar", 2: "baz"} 
+
+>>> d.items()
+[(0, 'foo'), (1, 'bar'), (2, 'baz')]
+
+>>> d.keys()
+[0, 1, 2]
+
+>>> d.values()
+['foo', 'bar', 'baz']
+
+>>>
+
+>>> a = d.keys()
+>>> b = d.values()
+
+>>> a
+[0, 1, 2]
+
+>>> b
+['foo', 'bar', 'baz']
+
+>>> a[0] = 7
+>>> a
+[7, 1, 2]
+
+>>> e = {}
+
+>>> for k,v in zip(a,b): 
+...   e.update({ k: v } )
+... 
+
+>>> e
+{1: 'bar', 2: 'baz', 7: 'foo'}
+>>>
+
+
+
+
