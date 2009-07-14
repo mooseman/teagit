@@ -6,16 +6,15 @@
 Teagit - the answer to the ultimate question of Life, the Universe and a 
 bored aspie coder with some time on his hands....
 
-The toy pseudo-quasi-version-tracking-like app that is 
+The toy pseudo-quasi-eventually-version-tracking-like app that is 
 almost (but not quite) entirely unlike Git....  
 
 If Git were a drink, and a Nutri-Matic Drink Synthesizer attempted 
 to make it, it would probably create something like this....   
 
-No simulated version-tracking is present in either the Python or 
-the C++ versions yet, but it is planned to be added.  
+No simulated "version-tracking" is present yet, but it is planned to be added eventually.  
 
-NOTE - this README and the two text files in this repo are used 
+NOTE - this README and the text files in this repo are used 
 as the data to be "committed" in the "repository".  
 
   ******************************************************* 
@@ -25,7 +24,7 @@ weld aircraft wings, warp drives or anything else onto it.
 
 Teagit is released to the public domain.  
 
-Brought to you by the number 42.  
+Brought to you by the letter "M" (for "moose" ;)  ) and the number 42.  
 
 "Share and enjoy"......  ;)  
 

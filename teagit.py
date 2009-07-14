@@ -1,6 +1,6 @@
 
 
-#  new_teagit.py 
+#  teagit.py 
 
 #  A new version of teagit which tries to make more use 
 #  of classes. This is aimed at coming a bit closer to 
@@ -18,27 +18,39 @@
 #  of this (not the working directory) that are added in a commit. 
 
 
-import hashlib 
+import hashlib, zlib, gzip  
 
 #  A file class 
 class file(object): 
-   def __init__(self):  
+   def init(self):  
       self.data = {}  
       
    def add(self, fname): 
       self.file = open(fname,'rb').read() 
-      self.sh=hashlib.sha1(file).hexdigest() 	  
+      self.sh=hashlib.sha1(self.file).hexdigest() 	  
       self.dirname = self.sh[0:2]  
-      self.gitfilename = self.sh[3:41] 
+      self.gitfilename = self.sh[2:41] 
       self.data.update({ self.sh:  [self.file, self.dirname, self.gitfilename] })   
             
    def display(self):
       print self.data   
       
       
-#  Create a file or two 
-a = file()
+#  Create a file instance 
+a = file() 
+a.init() 
+a.add('README') 
+a.add('Vitai-Lampada.txt')
+a.add('Mary-had-a-great-big-moose.txt')  
+a.display() 
+
+
+'''
+#  Create another file instance 
 b = file() 
+b.init() 
+b.add('Vitai-Lampada.txt')
+b.display()  '''   
        
       
             
