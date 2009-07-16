@@ -2,9 +2,34 @@
 
 #  teagit.py 
 
-#  A new version of teagit which tries to make more use 
-#  of classes. This is aimed at coming a bit closer to 
-#  the way that Git fits together. 
+# A simple program to create a thing that
+# is almost (but not quite) entirely unlike a Git repo.
+ 
+# If Git were a drink, and a Nutri-Matic Drink
+# Synthesizer attempted to make it, it would probably
+# create something like this....
+  
+# Author: mooseman
+
+# Acknowledgements: A very big "thank you" to the developers of 
+# Git - the DVCS that rules the universe. First written by Linus 
+# Torvalds and now maintained by Junio Hamano - you guys rock!  
+# Also a big "thank you" to Scott Chacon for his work on the 
+# "Git Community Book" - an *outstanding* resource for learning 
+# all about Git!    
+
+# This code is released to the public domain.
+# "Share and enjoy"...... ;) 
+
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+#  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+#  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+#  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+#  BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+#  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+#  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+#  SOFTWARE.
+
  
 #  TO DO - 
 #  1 - Get the most basic functionality working. 
@@ -18,19 +43,33 @@
 #  of this (not the working directory) that are added in a commit. 
 
 
-import hashlib, zlib, gzip  
+import hashlib, zlib, gzip, os.path   
 
 #  A file class 
+#  Note on the "mode" - to get the mode of a file or directory, 
+#  do the following - 
+#  numeric_mode = os.stat('file_or_dir_name')[0]  
+#  This creates a tuple with the stat details. The "mode" is the first 
+#  element of the tuple.  We need to convert it to octal, as follows -
+#  mymode = oct(numeric_mode & 0777)
+#  This will give you '0644' for a file, and '0755' for a directory 
+#  ( a "tree" in Git terms ) 
+#  For a file (a 'blob'), Git adds '10' to the front of the mode to 
+#  give you the string '100644' 
+#  For a directory, Git simply gives it the mode '040000'.    
+  
 class file(object): 
    def init(self):  
       self.data = {}  
       
    def add(self, fname): 
       self.file = open(fname,'rb').read() 
+      self.filesize = str(int(os.path.getsize(fname))) 
+      self.mode = '10' + oct(os.stat(fname)[0] & 0777) 
       self.sh=hashlib.sha1(self.file).hexdigest() 	  
       self.dirname = self.sh[0:2]  
       self.gitfilename = self.sh[2:41] 
-      self.data.update({ self.sh:  [self.file, self.dirname, self.gitfilename] })   
+      self.data.update({ self.sh:  [self.filesize, self.mode, self.file, self.dirname, self.gitfilename] })   
             
    def display(self):
       print self.data   
