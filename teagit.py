@@ -58,6 +58,40 @@ import hashlib, zlib, gzip, os.path
 #  give you the string '100644' 
 #  For a directory, Git simply gives it the mode '040000'.    
   
+  
+#  A class to get the SHA1 hash of a file or tree. 
+class sha(object): 
+   def init(self): 
+      self.data = None       
+               
+   def add(self, mydata): 
+      self.size = str(int(os.path.getsize(mydata)))  
+      self.mode = '10' + oct(os.stat(mydata)[0] & 0777) 
+      if self.mode == '100644': 
+         self.type = 'blob' 
+      else: 
+         self.type = 'tree' 
+      self.header = '"' + self.type + " " + self.size + "\0" + '"' 
+      self.data = self.header + mydata 
+      self.sha1 = hashlib.sha1(self.data).hexdigest()                   
+      
+   def display(self): 
+     print self.sha1  
+     
+     
+#  Test the class 
+a = sha() 
+a.init() 
+a.add('README') 
+a.display()  
+
+b = sha() 
+b.init() 
+b.add('Vitai-Lampada.txt')   
+b.display()  
+      
+  
+
 class file(object): 
    def init(self):  
       self.data = {}  
