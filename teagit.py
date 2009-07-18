@@ -57,41 +57,47 @@ import hashlib, zlib, gzip, os.path
 #  For a file (a 'blob'), Git adds '10' to the front of the mode to 
 #  give you the string '100644' 
 #  For a directory, Git simply gives it the mode '040000'.    
+
+#  A useful command for testing - 
+#  git hash-object filename   ( gives Gits SHA1 hash for a file )  
+
   
   
-#  A class to get the SHA1 hash of a file or tree. 
+#  A class to get the Git SHA1 objectID of a file or tree. 
 class sha(object): 
    def init(self): 
       self.data = None       
                
    def add(self, mydata): 
+      self.file = open(mydata, 'rb').read() 
       self.size = str(int(os.path.getsize(mydata)))  
       self.mode = '10' + oct(os.stat(mydata)[0] & 0777) 
       if self.mode == '100644': 
          self.type = 'blob' 
       else: 
-         self.type = 'tree' 
-      self.header = '"' + self.type + " " + self.size + "\0" + '"' 
-      self.data = self.header + mydata 
+         self.type = 'tree'       
+      self.header = self.type + " " + self.size + "\0"          
+      self.data = self.header + self.file 
       self.sha1 = hashlib.sha1(self.data).hexdigest()                   
       
    def display(self): 
-     print self.sha1  
+     print self.sha1 
      
      
 #  Test the class 
 a = sha() 
 a.init() 
-a.add('README') 
+a.add('Vitai-Lampada.txt') 
 a.display()  
 
 b = sha() 
 b.init() 
-b.add('Vitai-Lampada.txt')   
-b.display()  
-      
-  
+b.add('small_file2.txt') 
+b.display()
 
+     
+     
+#  A file class       
 class file(object): 
    def init(self):  
       self.data = {}  
