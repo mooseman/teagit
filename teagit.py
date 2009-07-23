@@ -38,6 +38,8 @@
 
 #  2 - Start on computing diffs on files. Find out exactly 
 #  what changes in a file from revision to revision. 
+#  ( Note to self: Git apparently uses "libxdiff" to calculate diffs. 
+#  find out more about that library. )  
 
 #  3 - Look at implementing the Git index. It is the contents 
 #  of this (not the working directory) that are added in a commit. 
@@ -66,34 +68,41 @@ import hashlib, zlib, gzip, os.path
 #  A class to get the Git SHA1 objectID of a file or tree. 
 class sha(object): 
    def init(self): 
-      self.data = None       
+      self.data = {}  
                
    def add(self, mydata): 
+      self.name = mydata 
       self.file = open(mydata, 'rb').read() 
       self.size = str(int(os.path.getsize(mydata)))  
       self.mode = '10' + oct(os.stat(mydata)[0] & 0777) 
-      if self.mode == '100644': 
+      if self.mode in ('100644' , '100755'): 
          self.type = 'blob' 
       else: 
          self.type = 'tree'       
       self.header = self.type + " " + self.size + "\0"          
-      self.data = self.header + self.file 
-      self.sha1 = hashlib.sha1(self.data).hexdigest()                   
+      self.stuff = self.header + self.file 
+      self.sha1 = hashlib.sha1(self.stuff).hexdigest()    
+      self.dirname = self.sha1[0:2]  
+      self.blobname = self.sha1[2:41]    
+      self.data.update({ self.blobname: [self.dirname, self.name, self.size, self.mode ] })                
       
    def display(self): 
-     print self.sha1 
+     print self.data  
      
      
 #  Test the class 
 a = sha() 
 a.init() 
 a.add('Vitai-Lampada.txt') 
+a.add('small_file2.txt') 
 a.display()  
 
+
+'''
 b = sha() 
 b.init() 
 b.add('small_file2.txt') 
-b.display()
+b.display()  '''  
 
      
      
@@ -116,12 +125,13 @@ class file(object):
       
       
 #  Create a file instance 
+'''
 a = file() 
 a.init() 
 a.add('README') 
 a.add('Vitai-Lampada.txt')
 a.add('Mary-had-a-great-big-moose.txt')  
-a.display() 
+a.display()  ''' 
 
 
 '''
