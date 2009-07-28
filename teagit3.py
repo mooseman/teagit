@@ -85,14 +85,32 @@ class sha(object):
       self.sha1 = hashlib.sha1(self.stuff).hexdigest()    
       self.dirname = self.sha1[0:2]  
       self.blobname = self.sha1[2:41]    
-      self.data.update({ self.blobname: [self.dirname, self.prev, self.name, self.size, self.mode ] })  
-      # Now, the just-added data will be the "prev" instance for the next data to be added.  
-      self.prev = self.blobname                
+      # self.data.update({ self.blobname: [self.dirname, self.prev, self.name, self.size, self.mode ] })  
       
+      # Now, the just-added data will be the "prev" instance for the next data to be added.  
+      self.prev = self.blobname     
+      
+      # Now, create the tree object to hold the blob   
+      # Test data - This should give the following hash - 
+      # dbb95599c651ffa577f79647c8a66c7225b30b6d
+      # "blob" "42"\0"100644 small_file.txt"\0b1e9ced39154adb38cfa26c652e017566ae2c7d9
+      
+      # A VERY HANDY COMMAND TO GET THE CONTENTS OF A GIVEN HASH 
+      # $ echo SHA1hash | git cat-file --batch 
+      # For example - 
+      # $ echo 05b217bb859794d08bb9e4f7f04cbda4b207fbe9 | git cat-file --batch
+
+      
+      self.tree_header = "tree" + " " + self.size + "\0" 
+      self.tree_data = self.mode + " " + self.name + "\0" + self.sha1  
+      self.tree_stuff = self.tree_header + self.tree_data 
+      self.tree_sha1 = hashlib.sha1(self.tree_stuff).hexdigest()   
+      self.data.update({ self.blobname: [self.tree_sha1 ] })  
+                           
    def display(self): 
      print self.data  
      
-     
+          
 #  Test the class 
 a = sha() 
 a.init() 

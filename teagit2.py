@@ -63,14 +63,13 @@ import hashlib, zlib, gzip, os.path
 #  A useful command for testing - 
 #  git hash-object filename   ( gives Gits SHA1 hash for a file )  
 
-  
-  
+    
 #  A class to get the Git SHA1 objectID of a file or tree. 
 class sha(object): 
    def init(self): 
       self.data = {}  
-      self.prev = self.blobname = None 
-               
+      self.prev = self.blobname = self.next = None 
+      
    def add(self, mydata): 
       self.name = mydata 
       self.file = open(mydata, 'rb').read() 
@@ -84,11 +83,11 @@ class sha(object):
       self.stuff = self.header + self.file 
       self.sha1 = hashlib.sha1(self.stuff).hexdigest()    
       self.dirname = self.sha1[0:2]  
-      self.blobname = self.sha1[2:41]    
-      self.data.update({ self.blobname: [self.dirname, self.prev, self.name, self.size, self.mode ] })  
-      # Now, the just-added data will be the "prev" instance for the next data to be added.  
-      self.prev = self.blobname                
-      
+      self.blobname = self.sha1[2:41]            
+      self.data.update({ self.blobname: [self.dirname, self.prev, self.name, self.size, self.mode ] })   
+      # Now, the just-added data will be the "prev" instance for the next data to be added. 
+      self.prev = self.blobname  
+                  
    def display(self): 
      print self.data  
      
@@ -97,11 +96,68 @@ class sha(object):
 a = sha() 
 a.init() 
 a.add('Vitai-Lampada.txt') 
-a.add('small_file.txt') 
+a.add('small_file2.txt') 
 a.display()  
 
 
+'''
+b = sha() 
+b.init() 
+b.add('small_file2.txt') 
+b.display()  '''  
 
+     
+     
+#  A file class       
+class file(object): 
+   def init(self):  
+      self.data = {}  
+      
+   def add(self, fname): 
+      self.file = open(fname,'rb').read() 
+      self.filesize = str(int(os.path.getsize(fname))) 
+      self.mode = '10' + oct(os.stat(fname)[0] & 0777) 
+      self.sh=hashlib.sha1(self.file).hexdigest() 	  
+      self.dirname = self.sh[0:2]  
+      self.gitfilename = self.sh[2:41] 
+      self.data.update({ self.sh:  [self.filesize, self.mode, self.file, self.dirname, self.gitfilename] })   
+            
+   def display(self):
+      print self.data   
+      
+      
+#  Create a file instance 
+'''
+a = file() 
+a.init() 
+a.add('README') 
+a.add('Vitai-Lampada.txt')
+a.add('Mary-had-a-great-big-moose.txt')  
+a.display()  ''' 
+
+
+'''
+#  Create another file instance 
+b = file() 
+b.init() 
+b.add('Vitai-Lampada.txt')
+b.display()  '''   
+       
+      
+            
+#  A blob class. A blob contains the contents 
+#  of a file - it is a binary "blob" of data. 
+class blob(object):  
+   def init(self): 
+      self.data = {} 
+      
+   def add(self, file): 
+      self.fname = file.fname 
+      self.objectid = file.objectid  
+      self.type = "blob" 
+             
+      
+        
 #  A tree class. This has the following attributes - 
 #  mode, object-type (file or tree), file (or tree) name, 
 #  objectID (which is the SHA1 hash of the object).  
@@ -193,6 +249,7 @@ class gitobject(object):
       self.data.update({ self.objectid: [self.name, self.obj_type] } ) 
       
                   
+   
    
 #  A repository object. This is a container for everything 
 #  above. 

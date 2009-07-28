@@ -85,19 +85,41 @@ class sha(object):
       self.sha1 = hashlib.sha1(self.stuff).hexdigest()    
       self.dirname = self.sha1[0:2]  
       self.blobname = self.sha1[2:41]    
-      self.data.update({ self.blobname: [self.dirname, self.prev, self.name, self.size, self.mode ] })  
-      # Now, the just-added data will be the "prev" instance for the next data to be added.  
-      self.prev = self.blobname                
+      # self.data.update({ self.blobname: [self.dirname, self.prev, self.name, self.size, self.mode ] })  
       
+      # Now, the just-added data will be the "prev" instance for the next data to be added.  
+      self.prev = self.blobname     
+      
+      # Now, create the tree object to hold the blob   
+      # Test data - This should give the following hash - 
+      # dbb95599c651ffa577f79647c8a66c7225b30b6d
+      # "blob" "42"\0"100644 small_file.txt"\0b1e9ced39154adb38cfa26c652e017566ae2c7d9
+      
+      # A VERY HANDY COMMAND TO GET THE CONTENTS OF A GIVEN HASH 
+      # $ echo SHA1hash | git cat-file --batch 
+      # For example - 
+      # $ echo dbb95599c651ffa577f79647c8a66c7225b30b6d | git cat-file --batch
+
+      # NOTE - THE REASON THAT I HAVE NOT BEEN ABLE TO GET THE CORRECT SHA1 FOR TREES 
+      # IS THAT I HAVE BEEN USING THE ***BLOBS SIZE!*** I NEED TO CALCULATE THE TREES 
+      # SIZE.  
+      # self.tree_header = "tree" + " " + self.size + "\0" 
+      self.tree_header = "tree" + " " + "37" + "\0"    
+      self.tree_data = "100644" + " " + self.name + "\0" + self.sha1  
+      self.tree_stuff = self.tree_header + self.tree_data 
+      self.tree_sha1 = hashlib.sha1(self.tree_stuff).hexdigest()   
+      self.data.update({ self.sha1: [self.tree_sha1 ] })  
+                           
    def display(self): 
      print self.data  
      
-     
+          
 #  Test the class 
 a = sha() 
 a.init() 
 a.add('Vitai-Lampada.txt') 
-a.add('small_file.txt') 
+a.add('hello.txt') 
+# a.add('small_file.txt') 
 a.display()  
 
 
