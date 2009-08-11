@@ -81,11 +81,26 @@ class sha(object):
       else: 
          self.type = 'tree'       
       self.header = self.type + " " + self.size + "\0"          
+      
+      #  Now - if we are dealing with a TREE (rather than a file), we do NOT 
+      #  take the SHA1 of the actual files contents. We take the SHA1 of the 
+      #  *files* SHA1.         
       self.stuff = self.header + self.file 
       self.sha1 = hashlib.sha1(self.stuff).hexdigest()    
       self.dirname = self.sha1[0:2]  
-      self.blobname = self.sha1[2:41]    
-      self.data.update({ self.blobname: [self.dirname, self.prev, self.name, self.size, self.mode ] })  
+      self.blobname = self.sha1[2:41]  
+      
+      #  Now, we get the SHA1 for the TREE 
+      #  Note - Need to find out **WHICH SIZE** is used here. 
+      self.tree_header = "tree" + " " + str(21) + "\0" + "100644 hello.txt" + "\0"       
+      self.tree_data = self.sha1        
+      self.tree_stuff = self.tree_header + self.tree_data 
+      self.tree_sha1 = hashlib.sha1(self.tree_stuff).hexdigest()  
+      
+      #  ( Still to come - get the SHA1 for a "commit".  )      
+      #  Save in our dict.  
+      self.data.update({ self.blobname: [self.dirname, self.prev, self.name, 
+          self.size, self.mode, self.tree_sha1 ] })  
       # Now, the just-added data will be the "prev" instance for the next data to be added.  
       self.prev = self.blobname                
       
@@ -96,8 +111,7 @@ class sha(object):
 #  Test the class 
 a = sha() 
 a.init() 
-a.add('Vitai-Lampada.txt') 
-a.add('small_file.txt') 
+a.add('hello.txt') 
 a.display()  
 
 
