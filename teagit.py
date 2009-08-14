@@ -92,6 +92,8 @@ class sha(object):
       
       #  Now, we get the SHA1 for the TREE 
       #  Note - Need to find out **WHICH SIZE** is used here. 
+      #  This SHA1 does not yet match the one created by Git for its tree 
+      #  objects. I have not been able to find out why this is.  
       self.tree_header = "tree" + " " + str(21) + "\0" + "100644 hello.txt" + "\0"       
       self.tree_data = self.sha1        
       self.tree_stuff = self.tree_header + self.tree_data 
