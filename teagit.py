@@ -21,28 +21,17 @@
 # This code is released to the public domain.
 # "Share and enjoy"...... ;) 
 
-#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-#  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-#  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-#  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
-#  BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-#  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-#  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-#  SOFTWARE.
-
  
 #  TO DO - 
 #  1 - Get the most basic functionality working. 
 #  That is - get a file's name, mode (permissions) and 
 #  its SHA1 hash.  Save these to disk (probably using pickle). 
 
-#  2 - Start on computing diffs on files. Find out exactly 
-#  what changes in a file from revision to revision. 
-#  ( Note to self: Git apparently uses "libxdiff" to calculate diffs. 
-#  find out more about that library. )  
+#  2 - Focus on using SHA1 hashes - they're the key to tracking the 
+#  state of a repo and its contents over time.  
 
-#  3 - Look at implementing the Git index. It is the contents 
-#  of this (not the working directory) that are added in a commit. 
+#  3 - Look at implementing a "staging area" to store "adds" before they  
+#  are committed. 
 
 
 import hashlib, zlib, gzip, os.path   
@@ -54,19 +43,9 @@ import hashlib, zlib, gzip, os.path
 #  This creates a tuple with the stat details. The "mode" is the first 
 #  element of the tuple.  We need to convert it to octal, as follows -
 #  mymode = oct(numeric_mode & 0777)
-#  This will give you '0644' for a file, and '0755' for a directory 
-#  ( a "tree" in Git terms ) 
-#  For a file (a 'blob'), Git adds '10' to the front of the mode to 
-#  give you the string '100644' 
-#  For a directory, Git simply gives it the mode '040000'.    
 
-#  A useful command for testing - 
-#  git hash-object filename   ( gives Gits SHA1 hash for a file )  
-
-  
-  
-#  A class to get the Git SHA1 objectID of a file or tree. 
-class sha(object): 
+#  A blob class.  
+class blob(object): 
    def init(self): 
       self.data = {}  
       self.prev = self.blobname = None 
@@ -82,27 +61,16 @@ class sha(object):
          self.type = 'tree'       
       self.header = self.type + " " + self.size + "\0"          
       
-      #  Now - if we are dealing with a TREE (rather than a file), we do NOT 
-      #  take the SHA1 of the actual files contents. We take the SHA1 of the 
-      #  *files* SHA1.         
+      #  Calculate the SHA1 hexdigest.  
       self.stuff = self.header + self.file 
       self.sha1 = hashlib.sha1(self.stuff).hexdigest()    
       self.dirname = self.sha1[0:2]  
       self.blobname = self.sha1[2:41]  
-      
-      #  Now, we get the SHA1 for the TREE 
-      #  Note - Need to find out **WHICH SIZE** is used here. 
-      #  This SHA1 does not yet match the one created by Git for its tree 
-      #  objects. I have not been able to find out why this is.  
-      self.tree_header = "tree" + " " + str(21) + "\0" + "100644 hello.txt" + "\0"       
-      self.tree_data = self.sha1        
-      self.tree_stuff = self.tree_header + self.tree_data 
-      self.tree_sha1 = hashlib.sha1(self.tree_stuff).hexdigest()  
-      
-      #  ( Still to come - get the SHA1 for a "commit".  )      
+            
+      #  ( To do - calculate the SHA1s for a "tree" and a "commit". )      
       #  Save in our dict.  
       self.data.update({ self.blobname: [self.dirname, self.prev, self.name, 
-          self.size, self.mode, self.tree_sha1 ] })  
+          self.size, self.mode ] })  
       # Now, the just-added data will be the "prev" instance for the next data to be added.  
       self.prev = self.blobname                
       
@@ -111,9 +79,9 @@ class sha(object):
      
      
 #  Test the class 
-a = sha() 
+a = blob() 
 a.init() 
-a.add('hello.txt') 
+a.add('file1.txt') 
 a.display()  
 
 
@@ -140,12 +108,10 @@ class tree(object):
       
 #  Run the code 
 a = tree() 
-
 a.init() 
-
 a.add("Main", "foo bar baz") 
-
 a.add("Main", (12, 43, 54, 68) ) 
+a.display() 
 
 
 
@@ -162,17 +128,18 @@ class tree2(object):
    def display(self): 
       print self.mode, self.object_type, self.name, self.objectid 
    
-   
 #  Create a few trees 
 c = tree() 
 d = tree() 
 e = tree() 
    
-      
-   
+         
 #  A commit object. This object is made up of trees - it shows 
 #  the state of a tree as at a given point in time. 
-#  The key is the objectid.  
+#  It also has metadata like the name of the committer, the commit 
+#  date and time, and commint comments. 
+#  The key is the SHA1 of the commit (which points to a tree). 
+#  Then there are the SHA1s of the trees and blobs.   
 class commit(object): 
    def __init__(self): 
       self.data = {} 
@@ -196,9 +163,9 @@ class tag(object):
             
            
    
-#  A Git object class. A git object can be one of the following  
+#  A "teagit object" class. This can be one of the following  
 #  types - blob, tree, commit, tag. 
-class gitobject(object):
+class teagitobject(object):
    def init(self): 
       self.data = {} 
       
@@ -208,8 +175,7 @@ class gitobject(object):
       self.obj_type = obj.type 
       self.data.update({ self.objectid: [self.name, self.obj_type] } ) 
       
-                  
-   
+                     
 #  A repository object. This is a container for everything 
 #  above. 
 class repo(object): 
