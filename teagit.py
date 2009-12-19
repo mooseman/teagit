@@ -59,7 +59,8 @@ class blob(object):
          self.type = 'blob' 
       else: 
          self.type = 'tree'       
-      self.header = self.type + " " + self.size + "\0"          
+      # Header - different to Git    
+      self.header = self.type + "*42*" + self.size + "moose" + "\0"          
       
       #  Calculate the SHA1 hexdigest.  
       self.stuff = self.header + self.file 
