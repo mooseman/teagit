@@ -46,8 +46,8 @@ import hashlib, zlib, gzip, os.path
 
 #  A blob class.  
 class blob(object): 
-   def init(self): 
-      self.data = {}  
+   def init(self):       
+      self.blobdict = self.treedict = {} 
       self.prev = self.blobname = None 
                
    def add(self, mydata): 
@@ -70,13 +70,19 @@ class blob(object):
             
       #  ( To do - calculate the SHA1s for a "tree" and a "commit". )      
       #  Save in our dict.  
-      self.data.update({ self.blobname: [self.dirname, self.prev, self.name, 
+      self.blobdict.update({ self.blobname: [self.dirname, self.prev, self.name, 
           self.size, self.mode ] })  
+      # Now create the TREE object for the blob     
+      # This will contain the following -     
+      # mode, object-type (blob or tree), file (or tree) name, 
+      # objectID (which is the SHA1 hash of the object).    
+      self.treedict.update({ self.blobname: [self.mode, self.type, 
+         self.name, self.size] })              
       # Now, the just-added data will be the "prev" instance for the next data to be added.  
       self.prev = self.blobname                
       
    def display(self): 
-     print self.data  
+     print self.treedict 
      
      
 #  Test the class 
