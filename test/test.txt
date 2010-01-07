@@ -1,0 +1,4 @@
+This is a document in a subdirectory. It is meant to help with testing of teagit. 
+The quick brown fox jumps over the lazy dog. 
+
+

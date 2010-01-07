@@ -34,7 +34,7 @@
 #  are committed. 
 
 
-import hashlib, zlib, gzip, os.path   
+import string, hashlib, zlib, gzip, os.path   
 
 #  A file class 
 #  Note on the "mode" - to get the mode of a file or directory, 
@@ -47,20 +47,20 @@ import hashlib, zlib, gzip, os.path
 #  A blob class.  
 class blob(object): 
    def init(self):       
-      self.blobdict = self.treedict = {} 
+      self.blobdict = self.treedict = self.repodict = {} 
       self.prev = self.blobname = None 
    
    # Note - we may need to change this so that we can add TREES as well 
-   # as blobs.                
+   # as blobs. Think about how to add trees.                 
    def add(self, mydata): 
       self.name = mydata 
-      self.file = open(mydata, 'rb').read() 
-      self.size = str(int(os.path.getsize(mydata)))  
-      self.mode = '10' + oct(os.stat(mydata)[0] & 0777) 
-      if self.mode in ('100644' , '100755'): 
+      if os.path.isfile(mydata): 
+         self.file = open(mydata, 'rb').read() 
          self.type = 'blob' 
-      else: 
-         self.type = 'tree'       
+      elif os.path.isdir(mydata):    
+         self.type = 'tree' 
+      self.size = str(int(os.path.getsize(mydata)))  
+      self.mode = '10' + oct(os.stat(mydata)[0] & 0777)       
       # Header - different to Git    
       self.header = self.type + "*42*" + self.size + "moose" + "\0"          
       
@@ -79,10 +79,24 @@ class blob(object):
           
       # Now create the TREE object for the blob. We do this when a 
       # commit is done. 
+      # To do - Do the code to calculate a SHA1 for a tree and a 
+      # commit. Also, fill the repodict dictionary with trees and blobs. 
+      # Need to create a commit object. This will point to a tree, and 
+      # will contain data like the author, a timestamp and a message. 
    def commit(self): 
+      # First, we create a "tree" object. This is comprised of a header
+      # and the data. 
+      
+   
+   
+   
       for blob in self.blobdict.keys(): 
          self.treedict.update({ self.blobname: [self.mode, self.type, 
             self.name, self.size] })              
+            
+            
+            
+            
             
    def display(self): 
      print self.treedict 
@@ -96,6 +110,8 @@ a.add('file2.txt')
 a.commit() 
 a.display()  
 a.add('Vitai-Lampada.txt') 
+a.commit()
+a.add('test') 
 a.commit()
 a.display()  
 
