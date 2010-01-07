@@ -49,7 +49,9 @@ class blob(object):
    def init(self):       
       self.blobdict = self.treedict = {} 
       self.prev = self.blobname = None 
-               
+   
+   # Note - we may need to change this so that we can add TREES as well 
+   # as blobs.                
    def add(self, mydata): 
       self.name = mydata 
       self.file = open(mydata, 'rb').read() 
@@ -72,24 +74,16 @@ class blob(object):
       #  Save in our dict.  
       self.blobdict.update({ self.blobname: [self.dirname, self.prev, self.name, 
           self.size, self.mode ] })  
-      # Now create the TREE object for the blob     
-      # This will contain the following -     
-      # mode, object-type (blob or tree), file (or tree) name, 
-      # objectID (which is the SHA1 hash of the object).  
-      # Note - it is possible that Git creates a tree object for every 
-      # blob (rather than just putting blobs into a single tree as here). 
-      # Need to check which way Git does it. 
-      # UPDATE - Git actually creates a new tree with every commit. At 
-      # each commit, the tree stores what is in the directory at that 
-      # point, and the commit points to that tree - as well as the 
-      # tree's parent(s) (if any).  
-      # So - we need to store a "pointer" to the previous (parent) tree, 
-      # as well as the current tree.   
-      self.treedict.update({ self.blobname: [self.mode, self.type, 
-         self.name, self.size] })              
       # Now, the just-added data will be the "prev" instance for the next data to be added.  
-      self.prev = self.blobname                
-      
+      self.prev = self.blobname                    
+          
+      # Now create the TREE object for the blob. We do this when a 
+      # commit is done. 
+   def commit(self): 
+      for blob in self.blobdict.keys(): 
+         self.treedict.update({ self.blobname: [self.mode, self.type, 
+            self.name, self.size] })              
+            
    def display(self): 
      print self.treedict 
      
@@ -99,7 +93,10 @@ a = blob()
 a.init() 
 a.add('file1.txt') 
 a.add('file2.txt') 
+a.commit() 
+a.display()  
 a.add('Vitai-Lampada.txt') 
+a.commit()
 a.display()  
 
 
