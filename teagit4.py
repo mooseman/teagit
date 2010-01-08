@@ -35,6 +35,7 @@
 
 
 import string, hashlib, zlib, gzip, os.path   
+from os.path import join, getsize
 
 #  A file class 
 #  Note on the "mode" - to get the mode of a file or directory, 
@@ -51,23 +52,32 @@ import string, hashlib, zlib, gzip, os.path
 #  Then there are the SHA1s of the trees and blobs.   
 class repo(object): 
    def __init__(self): 
-      self.data = {}             
+      self.data = {}      
+      #self.stuff = []       
       # Note - we may need to change this so that we can add TREES as well 
       # as blobs. Think about how to add trees.                 
    def add(self, mydata): 
       self.name = mydata 
       if os.path.isfile(mydata): 
          self.file = open(mydata, 'rb').read() 
+         self.size = str(int(os.path.getsize(mydata)))  
          self.type = 'blob' 
       elif os.path.isdir(mydata):    
-         self.type = 'tree' 
-      self.size = str(int(os.path.getsize(mydata)))  
+         self.file = [] 
+         #  Print a list of filenames and their sizes.         
+         for root, dirs, files in os.walk(mydata):     
+            self.size = sum(int(getsize(join(root, name))) for name in files)           
+            for name in files:                 
+                self.file.append([root, name, getsize(join(root, name))]) 
+            if '.git' in dirs:
+                dirs.remove('.git')  # don't visit .git directories        
+         self.type = 'tree'       
       self.mode = '10' + oct(os.stat(mydata)[0] & 0777)       
       # Header - different to Git    
-      self.header = self.type + "*42*" + self.size + "moose" + "\0"          
+      self.header = self.type + "*42*" + str(self.size) + "moose" + "\0"          
       
       #  Calculate the SHA1 hexdigest.  
-      self.stuff = self.header + self.file 
+      self.stuff = self.header + str(self.file) 
       self.sha1 = hashlib.sha1(self.stuff).hexdigest()    
       self.dirname = self.sha1[0:2]  
       self.blobname = self.sha1[2:41]  

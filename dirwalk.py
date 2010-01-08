@@ -8,9 +8,14 @@
 import os
 from os.path import join, getsize
 
+mylist = [] 
+
 for root, dirs, files in os.walk('/home/andy/teagit'):
     print root, "consumes",
-    print sum(getsize(join(root, name)) for name in files),
+    test = sum(int(getsize(join(root, name))) for name in files)
+    mylist.append(test) 
+    print mylist, 
+    print test, 
     print "bytes in", len(files), "non-directory files"
     if '.git' in dirs:
         dirs.remove('.git')  # don't visit .git directories
