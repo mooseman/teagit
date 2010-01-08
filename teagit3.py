@@ -108,10 +108,14 @@ a.init()
 a.add('file1.txt') 
 a.add('file2.txt') 
 a.commit() 
-a.display()  
 a.add('Vitai-Lampada.txt') 
 a.commit()
 a.add('test') 
+a.commit()
+# Need to fix. This is giving the same SHA1 code as adding the "test" 
+# directory. This means that it is not added to the dict because the dict
+# must have unique keys. 
+a.add('.')
 a.commit()
 a.display()  
 
