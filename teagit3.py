@@ -85,7 +85,8 @@ class blob(object):
       # will contain data like the author, a timestamp and a message. 
    def commit(self): 
       # First, we create a "tree" object. This is comprised of a header
-      # and the data. 
+      # and the data. We can do this by iterating through the 
+      # directory, adding each "blob" (file) to the tree object. 
       
    
    
@@ -124,22 +125,23 @@ a.display()
 #  A tree class. This has the following attributes - 
 #  mode, object-type (file or tree), file (or tree) name, 
 #  objectID (which is the SHA1 hash of the object).  
-class tree(object): 
+class tree(blob): 
    def init(self): 
       self.prev = self.address = self.next = 0
       self.branch = "Main" 
-      self.nodedict = {} 
+      self.treedict = {} 
 
+   # Add a blob or a tree.  
    def add(self, branch, data): 
       self.branch = branch 
       self.data = data        
       self.address = self.next 
       self.next += 1 
-      self.nodedict.update( {self.address: (self.branch, self.prev , self.next, self.data ) }) 
+      self.treedict.update( {self.address: (self.branch, self.prev , self.next, self.data ) }) 
       self.prev = self.address  
             
    def display(self): 
-      print self.nodedict 
+      print self.treedict 
       
 #  Run the code 
 a = tree() 
