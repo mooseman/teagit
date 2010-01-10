@@ -34,7 +34,7 @@
 #  are committed. 
 
 
-import string, hashlib, zlib, gzip, os.path   
+import sys, string, hashlib, zlib, gzip, os.path   
 from os.path import join, getsize
 
 #  A file class 
@@ -114,6 +114,7 @@ class repo(object):
          for k, v in self.commits.items(): 
             if k.startswith(obj): 
                print k, v
+               sys.exit() 
             else: 
                print "Object not found"      
                 
