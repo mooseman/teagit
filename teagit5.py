@@ -30,24 +30,15 @@
 #  2 - Focus on using SHA1 hashes - they're the key to tracking the 
 #  state of a repo and its contents over time.  
 
-#  3 - Look at implementing a "staging area" to store "adds" before they  
-#  are committed. 
-
-
 import sys, string, hashlib, zlib, gzip, os.path   
 from os.path import join, getsize
 
-#  A file class 
-#  Note on the "mode" - to get the mode of a file or directory, 
-#  do the following - 
-#  numeric_mode = os.stat('file_or_dir_name')[0]  
-#  This creates a tuple with the stat details. The "mode" is the first 
-#  element of the tuple.  We need to convert it to octal, as follows -
-#  mymode = oct(numeric_mode & 0777)    
-#  A commit object. This object is made up of trees - it shows 
-#  the state of a tree as at a given point in time. 
-#  It also has metadata like the name of the committer, the commit 
-#  date and time, and commint comments. 
+#  A repo class 
+#  A commit has a SHA1 ID, and points to a tree. 
+#  Trees are made up of blobs and other trees. 
+#  Blobs are standalone objects. 
+#  A commit has metadata like the name of the committer, the commit 
+#  date and time, and commit comments. 
 #  The key is the SHA1 of the commit (which points to a tree). 
 #  Then there are the SHA1s of the trees and blobs.   
 class repo(object): 
@@ -109,14 +100,14 @@ class repo(object):
    def display(self, obj=None): 
       if obj == None: 
          print self.commits             
-      else: 
-         mylen = len(obj) 
+      else:          
          for k, v in self.commits.items(): 
             if k.startswith(obj): 
                print k, v
                sys.exit() 
             else: 
-               print "Object not found"      
+               print "Object not found"    
+               sys.exit()   
                 
                                              
 #  Test the class 
